@@ -33,12 +33,6 @@ def fetch_weather_data(lat, lon, timezone, temperature_unit="fahrenheit", wind_s
     responses = openmeteo.weather_api(url, params=params)
     response = responses[0]  # Process the first location
 
-    # Print general information
-    print(f"Coordinates {response.Latitude()}°N {response.Longitude()}°E")
-    print(f"Elevation {response.Elevation()} m asl")
-    print(f"Timezone {response.Timezone()} {response.TimezoneAbbreviation()}")
-    print(f"Timezone difference to GMT+0 {response.UtcOffsetSeconds()} s")
-
     # Current values
     current = response.Current()
     current_data = {
@@ -47,48 +41,16 @@ def fetch_weather_data(lat, lon, timezone, temperature_unit="fahrenheit", wind_s
         "is_day": current.Variables(1).Value(),
         "rain": current.Variables(2).Value()
     }
-    print("Current weather:")
-    for key, value in current_data.items():
-        print(f"{key}: {value}")
 
-    # Hourly values
-    hourly = response.Hourly()
-    hourly_data = {
-        "date": pd.date_range(
-            start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
-            end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
-            freq=pd.Timedelta(seconds=hourly.Interval()),
-            inclusive="left"
-        ),
-        "temperature_2m": hourly.Variables(0).ValuesAsNumpy(),
-        "rain": hourly.Variables(1).ValuesAsNumpy()
-    }
-    hourly_dataframe = pd.DataFrame(data=hourly_data)
+    return current_data
 
-    print("Hourly weather data:")
-    print(hourly_dataframe)
-
-    return current_data, hourly_dataframe
-
-def time_until_rain(hourly_dataframe):
+def describe_weather(temperature, is_day, rain):
     """
-    Calculate the time until it rains based on the hourly forecast data.
-    Returns the duration in hours and the exact time of rain.
+    Describe the weather condition based on temperature, day/night, and rain.
     """
-    # Find the first occurrence of rain greater than 0
-    rain_data = hourly_dataframe[hourly_dataframe["rain"] > 0]
-    
-    if rain_data.empty:
-        return "No rain expected in the forecast period."
-    
-    first_rain_time = rain_data["date"].iloc[0]
-    current_time = hourly_dataframe["date"].iloc[0]
-    
-    # Calculate time difference
-    time_diff = first_rain_time - current_time
-    hours_until_rain = time_diff.total_seconds() / 3600
-
-    return f"Time until rain: {hours_until_rain:.2f} hours. Expected at {first_rain_time}."
+    temperature = round(temperature)  # Convert to whole number
+    condition = "Sunny" if is_day == 1 and rain == 0 else "Cloudy" if rain == 0 else "Rainy"
+    return f"{temperature}° {condition}"
 
 def get_location(lat, lon):
     """
@@ -102,8 +64,8 @@ def get_location(lat, lon):
     if location and location.raw.get("address"):
         address = location.raw["address"]
         city = address.get("city", address.get("town", address.get("village", "Unknown City")))
-        country = address.get("country", "Unknown Country")
-        return f"{city}, {country}"
+        country_code = address.get("country_code", "").upper()
+        return f"{city}, {country_code}"
 
     return "Location not found"
 
@@ -113,13 +75,25 @@ if __name__ == "__main__":
     timezone = "Asia/Dubai"
     
     # Fetch weather data
-    current_data, hourly_dataframe = fetch_weather_data(latitude, longitude, timezone)
+    current_data = fetch_weather_data(latitude, longitude, timezone)
     
-    # Calculate and print time until rain
-    rain_info = time_until_rain(hourly_dataframe)
-    print(rain_info)
+    # Extract and format weather
+    weather_description = describe_weather(
+        temperature=current_data["temperature_2m"],
+        is_day=current_data["is_day"],
+        rain=current_data["rain"]
+    )
     
-    # Get and print location
-    print("Fetching location...")
+    # Get location
     location = get_location(latitude, longitude)
-    print(f"Location: {location}")
+    
+    # Prepare the dictionary
+    output = {
+        "timezone": timezone,
+        "day_of_week": pd.Timestamp.now(tz=timezone).day_name(),
+        "location": location,
+        "weather": weather_description
+    }
+    
+    # Print the dictionary
+    print(output)
