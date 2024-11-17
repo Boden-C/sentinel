@@ -2,6 +2,9 @@ import openmeteo_requests
 import requests_cache
 import pandas as pd
 from retry_requests import retry
+from geopy.geocoders import Nominatim
+import ssl
+import certifi
 
 def fetch_weather_data(lat, lon, timezone, temperature_unit="fahrenheit", wind_speed_unit="mph", precipitation_unit="inch", models="gfs_seamless"):
     """
@@ -87,16 +90,36 @@ def time_until_rain(hourly_dataframe):
 
     return f"Time until rain: {hours_until_rain:.2f} hours. Expected at {first_rain_time}."
 
+def get_location(lat, lon):
+    """
+    Get the city and country name for a given latitude and longitude in English.
+    """
+    # Use a custom SSL context with certifi's CA bundle
+    ctx = ssl.create_default_context(cafile=certifi.where())
+    geolocator = Nominatim(user_agent="geoapi", ssl_context=ctx)
+    location = geolocator.reverse((lat, lon), exactly_one=True, language="en")  # Specify English
+
+    if location and location.raw.get("address"):
+        address = location.raw["address"]
+        city = address.get("city", address.get("town", address.get("village", "Unknown City")))
+        country = address.get("country", "Unknown Country")
+        return f"{city}, {country}"
+
+    return "Location not found"
 
 if __name__ == "__main__":
-    latitude = 32.779167  # Texas, USA
-    longitude = -96.808891
-    timezone = "America/Chicago"
+    latitude = 25.27  # Dubai, UAE
+    longitude = 55.29
+    timezone = "Asia/Dubai"
     
+    # Fetch weather data
     current_data, hourly_dataframe = fetch_weather_data(latitude, longitude, timezone)
     
     # Calculate and print time until rain
     rain_info = time_until_rain(hourly_dataframe)
     print(rain_info)
-
-
+    
+    # Get and print location
+    print("Fetching location...")
+    location = get_location(latitude, longitude)
+    print(f"Location: {location}")
