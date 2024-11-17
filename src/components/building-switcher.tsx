@@ -1,4 +1,3 @@
-// src/components/BuildingSwitcher.jsx
 import * as React from "react"
 import {
   CaretSortIcon,
@@ -7,7 +6,6 @@ import {
 } from "@radix-ui/react-icons"
 
 import { cn } from "@/lib/utils"
-import { Avatar } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -25,7 +23,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -36,38 +33,49 @@ import {
 } from "@/components/ui/popover"
 import { Building } from "lucide-react"
 
-/**
- * @typedef {Object} Building
- * @property {string} label - Building name
- * @property {string} value - Building identifier
- */
+const buildings = [
+  {
+    label: "Dallas Office",
+    value: "Dallas",
+  },
+  {
+    label: "Dubai Office",
+    value: "Dubai",
+  }
+];
 
-/**
- * BuildingSwitcher component for selecting and managing buildings
- * @returns {JSX.Element} BuildingSwitcher component
- */
-export function BuildingSwitcher() {
+export function BuildingSwitcher({ onBuildingChange }) {
   const [open, setOpen] = React.useState(false)
   const [showNewBuildingDialog, setShowNewBuildingDialog] = React.useState(false)
-  const [selectedBuilding, setSelectedBuilding] = React.useState({
-    label: "Main Building",
-    value: "main",
-  })
+  const [selectedBuilding, setSelectedBuilding] = React.useState(() => {
+    // Initialize from localStorage or default to first building
+    const saved = localStorage.getItem('selectedBuilding');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Error parsing saved building:', e);
+      }
+    }
+    return buildings[0];
+  });
 
-  const buildings = [
-    {
-      label: "Main Building",
-      value: "main",
-    },
-    {
-      label: "East Wing",
-      value: "east",
-    },
-    {
-      label: "West Wing",
-      value: "west",
-    },
-  ]
+  // Update localStorage when selection changes
+  const handleBuildingSelect = (building) => {
+    setSelectedBuilding(building);
+    localStorage.setItem('selectedBuilding', JSON.stringify(building));
+    setOpen(false);
+    if (onBuildingChange) {
+      onBuildingChange(building.value);
+    }
+  };
+
+  // Notify parent of initial building on mount
+  React.useEffect(() => {
+    if (onBuildingChange) {
+      onBuildingChange(selectedBuilding.value);
+    }
+  }, []);
 
   return (
     <Dialog open={showNewBuildingDialog} onOpenChange={setShowNewBuildingDialog}>
@@ -94,10 +102,7 @@ export function BuildingSwitcher() {
                 {buildings.map((building) => (
                   <CommandItem
                     key={building.value}
-                    onSelect={() => {
-                      setSelectedBuilding(building)
-                      setOpen(false)
-                    }}
+                    onSelect={() => handleBuildingSelect(building)}
                     className="text-sm"
                   >
                     <Building className="mr-2 h-4 w-4" />
