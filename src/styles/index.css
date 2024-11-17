@@ -21,6 +21,22 @@
   }
 }
 
+@keyframes pulse {
+  0% {
+    stroke-width: 2px;
+  }
+  50% {
+    stroke-width: 6px;
+  }
+  100% {
+    stroke-width: 2px;
+  }
+}
+
+.pulseStroke {
+  animation: pulse 3s ease-in-out infinite;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

@@ -54,34 +54,15 @@ export function AuthProvider({ children }) {
      * @param {boolean} [remember=false] - Whether to persist auth state
      */
     const signin = async (email, password, remember = false) => {
-        try {
-            // Set persistence based on remember preference
-            await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+        // Set persistence based on remember preference
+        await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
 
-            if (email === 'google') {
-                await signInWithPopup(auth, googleProvider);
-            } else if (email === 'github') {
-                await signInWithPopup(auth, githubProvider);
-            } else {
-                await signInWithEmailAndPassword(auth, email, password);
-            }
-        } catch (error) {
-            // Translate Firebase errors to user-friendly messages
-            const errorMessage = (() => {
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                    case 'auth/wrong-password':
-                        return 'Invalid email or password';
-                    case 'auth/too-many-requests':
-                        return 'Too many attempts. Please try again later';
-                    case 'auth/popup-closed-by-user':
-                        return 'Sign in was cancelled';
-                    default:
-                        return error.message;
-                }
-            })();
-
-            throw new Error(errorMessage);
+        if (email === 'google') {
+            await signInWithPopup(auth, googleProvider);
+        } else if (email === 'github') {
+            await signInWithPopup(auth, githubProvider);
+        } else {
+            await signInWithEmailAndPassword(auth, email, password);
         }
     };
 
@@ -93,46 +74,24 @@ export function AuthProvider({ children }) {
      * @param {boolean} [remember=true] - Whether to persist auth state
      */
     const signup = async (email, password, name = null, remember = true) => {
-        try {
-            // Set persistence based on remember preference
-            await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+        // Set persistence based on remember preference
+        await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
 
-            let userCredential;
+        let userCredential;
 
-            if (email === 'google') {
-                userCredential = await signInWithPopup(auth, googleProvider);
-            } else if (email === 'github') {
-                userCredential = await signInWithPopup(auth, githubProvider);
-            } else {
-                userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        if (email === 'google') {
+            userCredential = await signInWithPopup(auth, googleProvider);
+        } else if (email === 'github') {
+            userCredential = await signInWithPopup(auth, githubProvider);
+        } else {
+            userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-                // If a name was provided, update the user profile
-                if (name && userCredential.user) {
-                    await updateProfile(userCredential.user, {
-                        displayName: name,
-                    });
-                }
+            // If a name was provided, update the user profile
+            if (name && userCredential.user) {
+                await updateProfile(userCredential.user, {
+                    displayName: name,
+                });
             }
-        } catch (error) {
-            // Translate Firebase errors to user-friendly messages
-            const errorMessage = (() => {
-                switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        return 'An account with this email already exists';
-                    case 'auth/invalid-email':
-                        return 'Please enter a valid email address';
-                    case 'auth/operation-not-allowed':
-                        return 'Email/password accounts are not enabled. Please contact support.';
-                    case 'auth/weak-password':
-                        return 'Please choose a stronger password';
-                    case 'auth/popup-closed-by-user':
-                        return 'Sign up was cancelled';
-                    default:
-                        return error.message;
-                }
-            })();
-
-            throw new Error(errorMessage);
         }
     };
 
