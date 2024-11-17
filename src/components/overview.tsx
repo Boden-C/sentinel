@@ -15,17 +15,17 @@ function getColor(value, min, max) {
 
 function predictNextValues(historicalData, numPredictions = 6) {
   const lastValue = historicalData[historicalData.length - 1].energy;
-  const targetReduction = 0.15;
-  const perHourReduction = targetReduction / numPredictions;
+  const targetIncrease = 0.10; // Target increase over the prediction period
+  const perHourIncrease = targetIncrease / numPredictions;
 
   const lastDate = new Date(`2000/01/01 ${historicalData[historicalData.length - 1].hour}`);
   const predictions = [];
 
   for (let i = 1; i <= numPredictions; i++) {
     const nextDate = new Date(lastDate.getTime() + i * 60 * 60 * 1000);
-    const reductionFactor = 1 - (perHourReduction * i);
-    const variation = (Math.random() * 0.04) - 0.02;
-    const predictedEnergy = lastValue * (reductionFactor + variation);
+    const increaseFactor = 1 + (perHourIncrease * i);
+    const variation = (Math.random() * 0.03) - 0.01; // Add slight random variation with bias towards increase
+    const predictedEnergy = lastValue * (increaseFactor + variation);
 
     predictions.push({
       hour: nextDate.toTimeString().slice(0, 5),
@@ -36,6 +36,8 @@ function predictNextValues(historicalData, numPredictions = 6) {
 
   return predictions;
 }
+
+
 
 export function Overview() {
   const [data, setData] = useState([]);
@@ -65,22 +67,38 @@ export function Overview() {
 
     function setPlaceholderData() {
       const now = new Date();
+      
+      // Generate energy data based on time of day (simple day-night cycle model)
       const placeholderData = Array.from({ length: 24 }, (_, i) => {
-        const hour = new Date(now.getTime() - i * 60 * 60 * 1000);
+        const hour = Math.floor((now.getHours() + i) % 24); // Round down hour
+        let energy;
+    
+        // Simulate a pattern where energy usage increases during the day (6 AM to 6 PM) and decreases at night (6 PM to 6 AM)
+        if (hour >= 6 && hour < 18) {
+          energy = Math.floor(30 + Math.random() * 20); // Peak energy usage during the day (30 - 50)
+        } else {
+          energy = Math.floor(10 + Math.random() * 10); // Lower energy usage during the night (10 - 20)
+        }
+    
+        const time = new Date(now.getTime() - i * 60 * 60 * 1000);
+        time.setMinutes(0, 0, 0); // Set minutes, seconds, and milliseconds to 0
         return {
-          hour: hour.toTimeString().slice(0, 5),
-          energy: Math.floor(Math.random() * 50) + 10,
+          hour: time.toTimeString().slice(0, 5),
+          energy,
         };
-      }).reverse();
+      }).reverse(); // Reverse the data array to match the timeline
+    
       setData(placeholderData);
       const predictions = predictNextValues(placeholderData);
       setCombinedData([...placeholderData, ...predictions]);
-
+    
       // Delay the appearance of the prediction line (start animating after 1 second)
       setTimeout(() => {
         setShowPredictionLine(true);
       }, 1000); // Delay in milliseconds
     }
+    
+    
 
     loadData();
   }, []);
