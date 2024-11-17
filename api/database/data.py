@@ -1,7 +1,7 @@
 # database/data.py
 import math
 import random
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 from firebase_admin import firestore
 from datetime import datetime, timedelta, timezone
 import sys
@@ -30,40 +30,71 @@ def get_building_id(user_id: str, building_name: str) -> Optional[str]:
 
     return None
 
-def get_cached_data(user_id: str, building_name: str):
-    if building_name == "Dallas Office":
+def get_cached_data(user_id: str, building_name: str) -> List[Dict[str, str]]:
+    """
+    Get cached building data with proper timezone adjustments and error handling.
+    
+    Args:
+        user_id (str): The ID of the user requesting the data
+        building_name (str): Name of the building ("Dallas Office" or "Dubai Office")
+        
+    Returns:
+        List[Dict[str, str]]: List of building status dictionaries
+        
+    Raises:
+        ValueError: If building_name is not recognized
+    """
+    try:
         # Get the current UTC time
         utc_time = datetime.utcnow()
-        dallas_time = utc_time - timedelta(hours=6)
-        
-        # Format the time in HH:MM
-        dallas_time_str = dallas_time.strftime("%H:%M")
-        
-        return [
-            {
-                "title": "Optimize Energy Usage",
-                "description": f"It is currently {dallas_time_str} in Dallas on Sunday and is outside of business hours, HVAC is automatically lowered.",
-                "impact": "Estimated 10% reduction in energy usage by reducing energy usage.",
-            },
-            {
-                "title": "Turn Off Sprinklers",
-                "description": "According to weather forecasts, Dallas is expected to have rain later today.",
-                "impact": "Save up to 100 gallons of water by turning off sprinklers.",
-            }
-        ]
-    elif building_name == "Dubai Office":
-        # Get the current UTC time
-        utc_time = datetime.utcnow()
-        dubai_time = utc_time + timedelta(hours=4)
-        dallas_time_str = dubai_time.strftime("%H:%M")
-        
-        return [
-            {
-                "title": "Evening Settings",
-                "description": "It is now {dubai_time_str} in Dubai in the night, all energy usages are turned automatically off. The weather forecasts shows no significant requirements.",
-                "impact": "Save up to 20% of energy usage by turning off all appliances.",
-            }
-        ]
+
+        def round_to_nearest_hour(time: datetime) -> datetime:
+            """Round a datetime object to the nearest hour."""
+            if time.minute >= 30:
+                return time.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+            return time.replace(minute=0, second=0, microsecond=0)
+
+        if not isinstance(building_name, str):
+            raise ValueError(f"Building name must be a string, got {type(building_name)}")
+
+        if building_name == "Dallas Office":
+            # Dallas is UTC-6 hours during Standard Time
+            dallas_time = utc_time - timedelta(hours=6)
+            rounded_dallas_time = round_to_nearest_hour(dallas_time)
+            dallas_time_str = rounded_dallas_time.strftime("%H:%M")
+
+            return [
+                {
+                    "title": "Optimize Energy Usage",
+                    "description": f"The AI checked at {dallas_time_str} in Dallas on Sunday and is outside of business hours, HVAC is automatically lowered.",
+                    "impact": "Estimated 10% reduction in energy usage by reducing energy usage.",
+                },
+                {
+                    "title": "Turn Off Sprinklers",
+                    "description": "According to weather forecasts, Dallas is expected to have rain later today.",
+                    "impact": "Save up to 100 gallons of water by turning off sprinklers.",
+                }
+            ]
+
+        elif building_name == "Dubai Office":
+            # Dubai is UTC+4 hours year-round
+            dubai_time = utc_time + timedelta(hours=4)
+            rounded_dubai_time = round_to_nearest_hour(dubai_time)
+            dubai_time_str = rounded_dubai_time.strftime("%H:%M")
+
+            return [
+                {
+                    "title": "Evening Settings",
+                    "description": f"The AI checked at {dubai_time_str} in Dubai in the night, all energy usages are turned automatically off. The weather forecasts show no significant requirements.",
+                    "impact": "Save up to 20% of energy usage by turning off all appliances.",
+                }
+            ]
+        else:
+            raise ValueError(f"Unknown building name: {building_name}")
+
+    except Exception as e:
+        logging.error(f"Error in get_cached_data for user {user_id}, building {building_name}: {str(e)}")
+        raise
 
 def __fillDatabase():
     db = firestore.Client()

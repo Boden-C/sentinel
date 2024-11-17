@@ -4,9 +4,9 @@ import { CalendarDateRangePicker } from '@/components/date-range-picker';
 import { Overview } from '@/components/overview';
 import { BuildingSwitcher } from '@/components/building-switcher';
 import { UserNav } from '@/components/user-nav';
-import { MapPin, Clock, Cloud, Sun, CloudRain, CalendarCog, Search } from 'lucide-react';
+import { MapPin, Clock, Cloud, Sun, CloudRain, CalendarCog, Search, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { getBuildingData } from '@/scripts/api';
+import { getBuildingData, getGeneratedData } from '@/scripts/api';
 
 const getEmissionColor = (level) => {
     const colors = {
@@ -91,9 +91,7 @@ const WeatherCard = ({ buildingData }) => {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold mt-1 pb-1">{buildingData.location}</div>
-                <p className="text-sm text-muted-foreground mt-1">
-                    {buildingData.weather.temperature}°F - {buildingData.weather.condition}
-                </p>
+                <p className="text-sm text-muted-foreground mt-1">{buildingData.weather}</p>
             </CardContent>
         </Card>
     );
@@ -102,29 +100,66 @@ const WeatherCard = ({ buildingData }) => {
 export default function DashboardPage() {
     const [buildingData, setBuildingData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    // eslint-disable-next-line no-unused-vars
+    const [generatedActions, setGeneratedActions] = useState([]);
+    const [loadedActions, setLoadedActions] = useState([]);
+    const [isLoadingActions, setIsLoadingActions] = useState(false);
+
+    const loadActionsSequentially = async (actions) => {
+        setIsLoadingActions(true);
+        setLoadedActions([]);
+
+        for (let i = 0; i < actions.length; i++) {
+            // Add 10 second delay between each action
+            if (i > 0) {
+                await new Promise((resolve) => setTimeout(resolve, 10000));
+            }
+            setLoadedActions((prev) => [...prev, actions[i]]);
+        }
+
+        setIsLoadingActions(false);
+    };
 
     const handleBuildingChange = async (buildingValue) => {
         setIsLoading(true);
         try {
-            console.log(buildingValue+" Office")
-            const data = await getBuildingData(buildingValue+" Office");
-            console.log('Building data:', data);
+            const data = await getBuildingData(buildingValue + ' Office');
             setBuildingData(data);
+
+            // Fetch generated actions for the building
+            const actions = await getGeneratedData(buildingValue + ' Office');
+            setGeneratedActions(actions);
+
+            // Start loading actions sequentially
+            loadActionsSequentially(actions);
         } catch (error) {
-            console.error('Error fetching building data:', error);
+            console.error('Error fetching data:', error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Initial load
     useEffect(() => {
-        const savedBuilding = localStorage.getItem('selectedBuilding');
-        const initialBuilding = savedBuilding ? JSON.parse(savedBuilding).value : 'Dallas';
-        handleBuildingChange(initialBuilding);
+        const loadInitialBuilding = async () => {
+            const savedBuilding = localStorage.getItem('selectedBuilding');
+            let initialBuilding = 'Dallas';
+
+            if (savedBuilding) {
+                try {
+                    const parsed = JSON.parse(savedBuilding);
+                    initialBuilding = parsed.value;
+                } catch (e) {
+                    console.error('Error parsing saved building:', e);
+                }
+            }
+
+            await handleBuildingChange(initialBuilding);
+        };
+
+        loadInitialBuilding();
     }, []);
 
-    if (isLoading) {
+    if (isLoading && !buildingData) {
         return <div className="flex h-screen items-center justify-center">Loading...</div>;
     }
 
@@ -199,20 +234,24 @@ export default function DashboardPage() {
                                 [&::-webkit-scrollbar-thumb]:hover:bg-gray-400 dark:[&::-webkit-scrollbar-thumb]:hover:bg-gray-600
                                 [&::-webkit-scrollbar-track]:bg-transparent"
                             >
-                                <ActionItem
-                                    title="Adjust Thermostat Schedule"
-                                    description="Optimize your heating and cooling schedule based on occupancy patterns"
-                                    impact="Save up to $30/month"
-                                />
+                                {loadedActions.map((action, index) => (
+                                    <ActionItem
+                                        key={index}
+                                        title={action.title}
+                                        description={action.description}
+                                        impact={action.impact}
+                                    />
+                                ))}
+                                {isLoadingActions && (
+                                    <div className="flex items-center justify-center p-4">
+                                        <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+                                        <span className="ml-2">Implementing next action...</span>
+                                    </div>
+                                )}
                                 <SearchItem
                                     title="Search Energy Usage Patterns"
                                     description="Analyze historical data to identify optimization opportunities"
                                     impact="Potential savings analysis"
-                                />
-                                <ActionItem
-                                    title="LED Lighting Upgrade"
-                                    description="Replace remaining traditional bulbs with LED alternatives"
-                                    impact="Save up to $15/month"
                                 />
                             </div>
                         </CardContent>

@@ -4,7 +4,6 @@ import {
   CheckIcon,
   PlusCircledIcon,
 } from "@radix-ui/react-icons"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -48,34 +47,24 @@ export function BuildingSwitcher({ onBuildingChange }) {
   const [open, setOpen] = React.useState(false)
   const [showNewBuildingDialog, setShowNewBuildingDialog] = React.useState(false)
   const [selectedBuilding, setSelectedBuilding] = React.useState(() => {
-    // Initialize from localStorage or default to first building
     const saved = localStorage.getItem('selectedBuilding');
     if (saved) {
       try {
         return JSON.parse(saved);
       } catch (e) {
         console.error('Error parsing saved building:', e);
+        return buildings[0];
       }
     }
     return buildings[0];
   });
 
-  // Update localStorage when selection changes
   const handleBuildingSelect = (building) => {
     setSelectedBuilding(building);
     localStorage.setItem('selectedBuilding', JSON.stringify(building));
     setOpen(false);
-    if (onBuildingChange) {
-      onBuildingChange(building.value);
-    }
+    onBuildingChange(building.value);
   };
-
-  // Notify parent of initial building on mount
-  React.useEffect(() => {
-    if (onBuildingChange) {
-      onBuildingChange(selectedBuilding.value);
-    }
-  }, []);
 
   return (
     <Dialog open={showNewBuildingDialog} onOpenChange={setShowNewBuildingDialog}>

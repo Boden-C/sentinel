@@ -4,6 +4,8 @@ import requests
 import re
 from database.data import get_cached_data
 from dotenv import load_dotenv
+from weather import fetch_weather_data, describe_weather, get_location
+import pandas as pd
 # from openai import OpenAI   
 
 
@@ -127,8 +129,10 @@ def promptAI(prompt: str):
 
 def get_generated_data(user_id: str, building_name: str) -> dict:
     try:
+        print("2"+building_name)
         get_cached_data(user_id, building_name)
     except Exception as e:
+        print("New, use AI")
         promptAI(FIRST_PROMPT+building_name)
 
 
@@ -141,7 +145,7 @@ def get_building_data(user_id: str, building_name: str) -> dict:
         # Replace these with actual logic for fetching building details
         building_data = {
             "Dubai Office": {"latitude": 25.27, "longitude": 55.29, "timezone": "Asia/Dubai"},
-            "Dallas Office": {"latitude": 32.77, "longitude": -96.79, "timezone": "America/Chcago"}
+            "Dallas Office": {"latitude": 32.77, "longitude": -96.79, "timezone": "America/Chicago"}
         }
         
         if building_name not in building_data:

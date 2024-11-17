@@ -15,7 +15,9 @@ def generate_data(building_name):
     """
     try:
         # Call get_generated_data with authenticated user's ID and building_name
+        print("1"+building_name)
         data = get_generated_data(user_id=g.user_id, building_name=building_name)
+        print(data)
         
         # Assuming the function returns data that you want to jsonify
         return jsonify(data), 200
