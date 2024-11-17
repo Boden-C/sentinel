@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, g
 from wrappers import verify_token
 from main.data import getGeneratedData, getUserData
 from exceptions import ClientError
-from main.data import promptPerplexity
+from main.data import promptAI
 
 # Define the Blueprint
 data_bp = Blueprint('data_bp', __name__)
