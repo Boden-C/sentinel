@@ -3,6 +3,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import firebase_admin
 from firebase_admin import credentials, firestore
+from main.data import promptPerplexity
 
 # Initialize Flask app
 app = Flask(__name__)

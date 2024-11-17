@@ -1,4 +1,9 @@
 from flask import json
+import os
+import requests
+import re
+from dotenv import load_dotenv
+
 
 FIRST_PROMPT = """DO NOT USE CODE TO ANALYZE, USE NATURAL LANGUAGE PROCESSING
 Please think over what you say to see if it makes sense and if it's easy for the client to understand. 
@@ -58,3 +63,60 @@ def parseGeneratedResponseForJson(response:str) -> dict:
     
     # Return the parsed response
     return parsed_response 
+
+
+
+
+# Load environment variables from .env.local
+load_dotenv('.env.local')
+
+def promptPerplexity(prompt: str):
+    """
+    Sends a prompt to the Perplexity API, retrieves only the content field, and removes all asterisks or similar characters.
+    
+    Args:
+        prompt (str): The user query for the Perplexity API.
+
+    Returns:
+        str: The content field from the API response without asterisks or an error message.
+    """
+    url = "https://api.perplexity.ai/chat/completions"
+    api_key = os.getenv("PERPLEXITY_API_KEY")
+    
+    if not api_key:
+        return "Error: API key not found in environment variables"
+
+    payload = {
+        "model": "llama-3.1-sonar-small-128k-online",
+        "messages": [
+            {"role": "system", "content": "Be precise and concise."},
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.2,
+        "top_p": 0.9,
+        "return_citations": True,
+        "return_images": False,
+        "return_related_questions": False,
+        "search_recency_filter": "month",
+        "presence_penalty": 0,
+        "frequency_penalty": 1
+    }
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        # Navigate to the content field
+        try:
+            content = data["choices"][0]["message"]["content"]
+            # Remove asterisks, including Unicode representations
+            cleaned_content = re.sub(r'[\*\u002A\uFE61\uFF0A]', '', content)
+            return cleaned_content
+        except KeyError:
+            return "Error: 'content' field not found in response"
+    else:
+        return f"Error: API request failed with status code {response.status_code}"
