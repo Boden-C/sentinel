@@ -94,14 +94,14 @@ function generateFallbackData(buildingName) {
 
     if (buildingName === "Dallas Office") {
         // Dallas is UTC-6 hours during Standard Time
-        const dallasTime = new Date(utcTime.getTime() - (6 * 60 * 60 * 1000));
+        const dallasTime = new Date(utcTime.getTime()-3*60*60*1000);
         const roundedDallasTime = roundToNearestHour(dallasTime);
         const dallasTimeStr = formatTime(roundedDallasTime);
 
         return [
             {
                 title: "Optimize Energy Usage",
-                description: `The AI checked at ${dallasTimeStr} in Dallas on Sunday and is outside of business hours, HVAC is automatically lowered.`,
+                description: `Checked at ${dallasTimeStr} in Dallas on Sunday. This is typically outside of business hours, therefore HVAC is automatically lowered.`,
                 impact: "Estimated 10% reduction in energy usage by reducing energy usage.",
             },
             {
@@ -112,7 +112,7 @@ function generateFallbackData(buildingName) {
         ];
     } else if (buildingName === "Dubai Office") {
         // Dubai is UTC+4 hours year-round
-        const dubaiTime = new Date(utcTime.getTime() + (4 * 60 * 60 * 1000));
+        const dubaiTime = new Date(utcTime.getTime()+9*60*60*1000);
         const roundedDubaiTime = roundToNearestHour(dubaiTime);
         const dubaiTimeStr = formatTime(roundedDubaiTime);
 
@@ -121,7 +121,8 @@ function generateFallbackData(buildingName) {
                 title: "Evening Settings",
                 description: `The AI checked at ${dubaiTimeStr} in Dubai in the night, all energy usages are turned automatically off. The weather forecasts show no significant requirements.`,
                 impact: "Save up to 20% of energy usage by turning off all appliances.",
-            }
+            },
+
         ];
     } else {
         throw new Error(`Unknown building name: ${buildingName}`);

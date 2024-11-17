@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarDateRangePicker } from '@/components/date-range-picker';
 import { Overview } from '@/components/overview';
 import { BuildingSwitcher } from '@/components/building-switcher';
 import { UserNav } from '@/components/user-nav';
@@ -39,7 +38,7 @@ const SearchItem = ({ title, description, impact }) => (
         </div>
         <p className="text-sm text-muted-foreground">{description}</p>
         <p className="text-sm font-medium mt-2">Potential Impact: {impact}</p>
-        <Button className="mt-2 text-yellow-500" variant="outline">
+        <Button className="mt-2 text-yellow-500" variant="outline" >
             Search
         </Button>
     </div>
@@ -169,7 +168,6 @@ export default function DashboardPage() {
                 <div className="flex h-16 items-center px-4">
                     <BuildingSwitcher onBuildingChange={handleBuildingChange} />
                     <div className="ml-auto flex items-center space-x-4">
-                        <CalendarDateRangePicker />
                         <UserNav />
                     </div>
                 </div>
@@ -249,9 +247,9 @@ export default function DashboardPage() {
                                     </div>
                                 )}
                                 <SearchItem
-                                    title="Search Energy Usage Patterns"
-                                    description="Analyze historical data to identify optimization opportunities"
-                                    impact="Potential savings analysis"
+                                    title="Search for Renewable Energy Providers"
+                                    description="Assistant recommends these sources for renewable energy."
+                                    impact="Helps contribute to a greener environment."
                                 />
                             </div>
                         </CardContent>
