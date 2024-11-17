@@ -1,6 +1,7 @@
 import math
 import random
-
+import firebase_admin
+from firebase_admin import initialize_app
 from flask import logging
 from typing import Dict, List, Optional, Tuple
 from firebase_admin import firestore
@@ -13,8 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from exceptions import ClientError
 
 # Initialize Firebase Admin if not already initialized
-import firebase_admin
-if not firebase_admin._apps:
+if not firebase_admin:
     initialize_app()
 
 def get_building_id(user_id: str, building_name: str) -> Optional[str]:
