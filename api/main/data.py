@@ -3,6 +3,7 @@ import os
 import requests
 import re
 from dotenv import load_dotenv
+# from openai import OpenAI   
 
 
 FIRST_PROMPT = """DO NOT USE CODE TO ANALYZE, USE NATURAL LANGUAGE PROCESSING
@@ -67,15 +68,16 @@ def parseGeneratedResponseForJson(response:str) -> dict:
 
 
 
-# Load environment variables from .env.local
+# Load environment variables
 load_dotenv('.env.local')
 
-def promptPerplexity(prompt: str):
+def promptAI(prompt: str):
     """
-    Sends a prompt to the Perplexity API, retrieves only the content field, and removes all asterisks or similar characters.
-    
+    Sends a prompt to the Perplexity API (renamed to promptAI), retrieves only the content field, and removes 
+    all asterisks or similar characters. Includes a model label set to 'gpt-4o'.
+
     Args:
-        prompt (str): The user query for the Perplexity API.
+        prompt (str): The user query for the API.
 
     Returns:
         str: The content field from the API response without asterisks or an error message.
@@ -87,7 +89,7 @@ def promptPerplexity(prompt: str):
         return "Error: API key not found in environment variables"
 
     payload = {
-        "model": "llama-3.1-sonar-small-128k-online",
+        "model": "llama-3.1-sonar-huge-128k-online",  # Updated model label
         "messages": [
             {"role": "system", "content": "Be precise and concise."},
             {"role": "user", "content": prompt}

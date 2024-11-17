@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, g
 from wrappers import verify_token
 # from main.data import getGeneratedData, getUserData
 from exceptions import ClientError
-from main.data import promptPerplexity
+from main.data import promptAI
 
 # Define the Blueprint
 data_bp = Blueprint('data_bp', __name__)
@@ -14,7 +14,7 @@ def generate_data():
     """
     try:
         # Call getGeneratedData with authenticated user's ID
-        strdata = promptPerplexity("search what is happening around austin texas during this week related to aquiring renewable energy")
+        strdata = promptAI("search what is happening around austin texas during this week related to aquiring renewable energy")
         # data = getGeneratedData(user_id=g.user_id)
 
         return jsonify(strdata), 200
