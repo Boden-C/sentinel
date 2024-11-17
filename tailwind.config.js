@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 export default {
     darkMode: ['class'],
     content: ['./src/**/*.{js,jsx,ts,tsx}'],
@@ -52,5 +53,7 @@ export default {
     		}
     	}
     },
-    plugins: [require("tailwindcss-animate")],
+    plugins: [
+		require("tailwindcss-animate"),
+	],
 };

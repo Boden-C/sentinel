@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { AddReservation, DeleteReservation } from './pages/ReservationPage';
 import { PrivateRoute } from './components/PrivateRoute';
 import { AuthProvider } from './components/AuthContext';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -25,22 +24,6 @@ function App() {
                             element={
                                 <PrivateRoute>
                                     <DashboardPage />
-                                </PrivateRoute>
-                            }
-                        />
-                        <Route
-                            path="/reserve"
-                            element={
-                                <PrivateRoute>
-                                    <AddReservation />
-                                </PrivateRoute>
-                            }
-                        />
-                        <Route
-                            path="/delete"
-                            element={
-                                <PrivateRoute>
-                                    <DeleteReservation />
                                 </PrivateRoute>
                             }
                         />
