@@ -15,11 +15,9 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 from routes.authenticate import authentication_bp
-from routes.reservations import reservations_bp
 
 # Register blueprints with a URL prefix
 app.register_blueprint(authentication_bp, url_prefix='/api')
-app.register_blueprint(reservations_bp, url_prefix='/api')
 
 # Run the app
 if __name__ == '__main__':

@@ -40,6 +40,7 @@ function predictNextValues(historicalData, numPredictions = 6) {
 export function Overview() {
   const [data, setData] = useState([]);
   const [combinedData, setCombinedData] = useState([]);
+  const [showPredictionLine, setShowPredictionLine] = useState(false); // State to control the delay
 
   useEffect(() => {
     async function loadData() {
@@ -49,6 +50,11 @@ export function Overview() {
           setData(energyData);
           const predictions = predictNextValues(energyData);
           setCombinedData([...energyData, ...predictions]);
+
+          // Delay the appearance of the prediction line (start animating after 1 second)
+          setTimeout(() => {
+            setShowPredictionLine(true);
+          }, 1000); // Delay in milliseconds
         } else {
           setPlaceholderData();
         }
@@ -69,6 +75,11 @@ export function Overview() {
       setData(placeholderData);
       const predictions = predictNextValues(placeholderData);
       setCombinedData([...placeholderData, ...predictions]);
+
+      // Delay the appearance of the prediction line (start animating after 1 second)
+      setTimeout(() => {
+        setShowPredictionLine(true);
+      }, 1000); // Delay in milliseconds
     }
 
     loadData();
@@ -120,33 +131,36 @@ export function Overview() {
           stroke="url(#lineGradient)"
           strokeWidth={3}
           dot={{
-            strokeWidth: 2,
+            strokeWidth: 1,
             fill: "#fff",
-            r: 5,
+            r: 3,
             stroke: "#888888",
           }}
           connectNulls
+          animationDuration={1000} // Duration of the first line animation
         />
-        <Line
-          type="monotone"
-          dataKey="predictedEnergy"
-          stroke="#888888"
-          strokeWidth={2}
-          strokeDasharray="5 5"
-          dot={false}
-          activeDot={{
-            r: 6,
-            fill: "#fff",
-            stroke: "#888888",
-            strokeWidth: 2,
-          }}
-          connectNulls
-        />
+        {showPredictionLine && (
+          <Line
+            type="monotone"
+            dataKey="predictedEnergy"
+            stroke="#888888"
+            strokeWidth={2}
+            strokeDasharray="5 5"
+            dot={false}
+            activeDot={{
+              r: 3,
+              fill: "#fff",
+              stroke: "#888888",
+              strokeWidth: 1,
+            }}
+            connectNulls
+            animationDuration={1500}  // Slower animation (increased duration)
+            animationBegin={1000}  // Delay the start of the prediction line animation
+            className="pulseStroke" // Apply pulsing effect via CSS class
+          />
+        )}
       </LineChart>
     </ResponsiveContainer>
   );
 }
-
-
-
 

@@ -1,5 +1,7 @@
 'use strict';
 
+import { GeneratedData } from './types.js';
+
 export function fetchEnergyData() {
     console.log('fetching energy data');
 }
@@ -12,3 +14,12 @@ export function fetchEnergyData() {
 //   ]
 
 
+/**
+ * Fetches the generated data from the server.
+ * @returns {Promise<GeneratedData>} The generated data object.
+ */
+export function getGeneratedData() {
+    return new GeneratedData({
+        
+    });
+}
