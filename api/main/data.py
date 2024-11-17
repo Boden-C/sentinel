@@ -133,7 +133,49 @@ def get_generated_data(user_id: str, building_name: str) -> dict:
 
 
 def get_building_data(user_id: str, building_name: str) -> dict:
+    """
+    Fetches and returns weather and location data for a specified user and building.
+    """
     try:
-        print()
+        # Sample latitude, longitude, and timezone for the building
+        # Replace these with actual logic for fetching building details
+        building_data = {
+            "Dubai Office": {"latitude": 25.27, "longitude": 55.29, "timezone": "Asia/Dubai"},
+            "Dallas Office": {"latitude": 32.77, "longitude": -96.79, "timezone": "America/Chcago"}
+        }
+        
+        if building_name not in building_data:
+            raise ValueError(f"Building {building_name} not found.")
+
+        # Get building-specific data
+        data = building_data[building_name]
+        latitude = data["latitude"]
+        longitude = data["longitude"]
+        timezone = data["timezone"]
+
+        # Fetch weather data
+        current_data = fetch_weather_data(latitude, longitude, timezone)
+
+        # Extract and format weather
+        weather_description = describe_weather(
+            temperature=current_data["temperature_2m"],
+            is_day=current_data["is_day"],
+            rain=current_data["rain"]
+        )
+
+        # Get location
+        location = get_location(latitude, longitude)
+
+        # Prepare the output dictionary
+        output = {
+            "timezone": timezone,
+            "day_of_week": pd.Timestamp.now(tz=timezone).day_name(),
+            "location": location,
+            "weather": weather_description
+        }
+
+        return output
+
     except Exception as e:
-        print()
+        print(f"Error: {e}")
+        return {"error": str(e)}
