@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, g
 from wrappers import verify_token
-from main.data import getGeneratedData, getUserData
+from main.data import get_generated_data, get_building_data
 from exceptions import ClientError
 from main.data import promptAI
 
@@ -14,8 +14,8 @@ def generate_data(building_name):
     Generate data for the authenticated user based on the building name.
     """
     try:
-        # Call getGeneratedData with authenticated user's ID and building_name
-        data = getGeneratedData(user_id=g.user_id, building_name=building_name)
+        # Call get_generated_data with authenticated user's ID and building_name
+        data = get_generated_data(user_id=g.user_id, building_name=building_name)
         
         # Assuming the function returns data that you want to jsonify
         return jsonify(data), 200
@@ -27,17 +27,16 @@ def generate_data(building_name):
         return jsonify({'message': str(e)}), 500
 
 
-@data_bp.route('/data/user', methods=['GET'])
+@data_bp.route('/data/user/<building_name>', methods=['GET'])
 @verify_token
-def user_data():
+def user_data(building_name):
     """
     Retrieve data for the authenticated user.
     """
     try:
-        # Call getUserData with authenticated user's ID
-        # data = getUserData(user_id=g.user_id)
+        data = get_building_data(user_id=g.user_id, building_name=building_name)
 
-        return jsonify("data"), 200
+        return jsonify(data), 200
     
     except ClientError as e:
         return jsonify({'message': e.message}), e.code

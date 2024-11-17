@@ -2,6 +2,7 @@ from flask import json
 import os
 import requests
 import re
+from database.data import get_cached_data
 from dotenv import load_dotenv
 # from openai import OpenAI   
 
@@ -124,7 +125,14 @@ def promptAI(prompt: str):
         return f"Error: API request failed with status code {response.status_code}"
 
 
-def getGeneratedData(user_id: str, building_name: str) -> dict:
+def get_generated_data(user_id: str, building_name: str) -> dict:
+    try:
+        get_cached_data(user_id, building_name)
+    except Exception as e:
+        promptAI(FIRST_PROMPT+building_name)
+
+
+def get_building_data(user_id: str, building_name: str) -> dict:
     try:
         print()
     except Exception as e:
