@@ -3,6 +3,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import firebase_admin
 from firebase_admin import credentials, firestore
+from main.data import promptPerplexity
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -15,11 +16,12 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 from routes.authenticate import authentication_bp
-from routes.reservations import reservations_bp
+from routes.data import data_bp
 
 # Register blueprints with a URL prefix
 app.register_blueprint(authentication_bp, url_prefix='/api')
-app.register_blueprint(reservations_bp, url_prefix='/api')
+app.register_blueprint(data_bp, url_prefix='/api')
+print(promptPerplexity("search what is happening around austin texas during this week related to aquiring renewable energy"))
 
 # Run the app
 if __name__ == '__main__':
