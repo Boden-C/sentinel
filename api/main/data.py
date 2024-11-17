@@ -120,3 +120,10 @@ def promptPerplexity(prompt: str):
             return "Error: 'content' field not found in response"
     else:
         return f"Error: API request failed with status code {response.status_code}"
+
+
+def getGeneratedData(user_id: str, building_name: str) -> dict:
+    try:
+        print()
+    except Exception as e:
+        print()

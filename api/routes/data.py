@@ -1,23 +1,24 @@
 from flask import Blueprint, jsonify, g
 from wrappers import verify_token
-# from main.data import getGeneratedData, getUserData
+from main.data import getGeneratedData, getUserData
 from exceptions import ClientError
 from main.data import promptPerplexity
 
 # Define the Blueprint
 data_bp = Blueprint('data_bp', __name__)
 
-@data_bp.route('/data/generate', methods=['GET'])
-def generate_data():
+@data_bp.route('/data/generate/<building_name>', methods=['GET'])
+@verify_token
+def generate_data(building_name):
     """
-    Generate data for the authenticated user.
+    Generate data for the authenticated user based on the building name.
     """
     try:
-        # Call getGeneratedData with authenticated user's ID
-        strdata = promptPerplexity("search what is happening around austin texas during this week related to aquiring renewable energy")
-        # data = getGeneratedData(user_id=g.user_id)
-
-        return jsonify(strdata), 200
+        # Call getGeneratedData with authenticated user's ID and building_name
+        data = getGeneratedData(user_id=g.user_id, building_name=building_name)
+        
+        # Assuming the function returns data that you want to jsonify
+        return jsonify(data), 200
     
     except ClientError as e:
         return jsonify({'message': e.message}), e.code
