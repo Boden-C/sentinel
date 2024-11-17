@@ -5,12 +5,9 @@ import { Overview } from '@/components/overview';
 import { BuildingSwitcher } from '@/components/building-switcher';
 import { UserNav } from '@/components/user-nav';
 import { MapPin, Clock, Cloud, Sun, CloudRain, CalendarCog, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { getBuildingData } from '@/scripts/api';
 
-/**
- * Determines the emission level color based on the provided level
- * @param {'low' | 'medium' | 'high'} level - The emission level
- * @returns {string} Tailwind color class
- */
 const getEmissionColor = (level) => {
     const colors = {
         low: 'text-green-500',
@@ -20,9 +17,6 @@ const getEmissionColor = (level) => {
     return colors[level] || colors.medium;
 };
 
-/**
- * @param {{ title: string, description: string, impact: string }} props
- */
 const ActionItem = ({ title, description, impact }) => (
     <div className="mb-4 p-4 border-2 rounded-lg">
         <div className="flex items-center gap-2">
@@ -37,9 +31,6 @@ const ActionItem = ({ title, description, impact }) => (
     </div>
 );
 
-/**
- * @param {{ title: string, description: string, impact: string }} props
- */
 const SearchItem = ({ title, description, impact }) => (
     <div className="mb-4 p-4 border-2 rounded-lg">
         <div className="flex items-center gap-2">
@@ -55,7 +46,7 @@ const SearchItem = ({ title, description, impact }) => (
 );
 
 const WeatherIcon = ({ condition }) => {
-    switch (condition.toLowerCase()) {
+    switch (condition?.toLowerCase()) {
         case 'sunny':
             return <Sun className="h-4 w-4 text-yellow-500" />;
         case 'cloudy':
@@ -67,12 +58,81 @@ const WeatherIcon = ({ condition }) => {
     }
 };
 
+const formatTime = (timezone) => {
+    return new Date().toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: timezone,
+    });
+};
+
+const WeatherCard = ({ buildingData }) => {
+    const [currentTime, setCurrentTime] = useState(formatTime(buildingData.timezone));
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(formatTime(buildingData.timezone));
+        }, 60000); // Update every minute
+
+        return () => clearInterval(timer);
+    }, [buildingData.timezone]);
+
+    return (
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+                <CardTitle className="text-sm font-medium">
+                    {buildingData.day_of_week} {currentTime}
+                </CardTitle>
+                <div className="flex gap-2">
+                    <MapPin className="h-4 w-4 text-blue-500" />
+                    <Clock className="h-4 w-4 text-gray-500" />
+                    <WeatherIcon condition={buildingData.weather.condition} />
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold mt-1 pb-1">{buildingData.location}</div>
+                <p className="text-sm text-muted-foreground mt-1">
+                    {buildingData.weather.temperature}°F - {buildingData.weather.condition}
+                </p>
+            </CardContent>
+        </Card>
+    );
+};
+
 export default function DashboardPage() {
+    const [buildingData, setBuildingData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const handleBuildingChange = async (buildingValue) => {
+        setIsLoading(true);
+        try {
+            console.log(buildingValue+" Office")
+            const data = await getBuildingData(buildingValue+" Office");
+            console.log('Building data:', data);
+            setBuildingData(data);
+        } catch (error) {
+            console.error('Error fetching building data:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Initial load
+    useEffect(() => {
+        const savedBuilding = localStorage.getItem('selectedBuilding');
+        const initialBuilding = savedBuilding ? JSON.parse(savedBuilding).value : 'Dallas';
+        handleBuildingChange(initialBuilding);
+    }, []);
+
+    if (isLoading) {
+        return <div className="flex h-screen items-center justify-center">Loading...</div>;
+    }
+
     return (
         <div className="flex h-screen flex-col">
             <div className="border-b">
                 <div className="flex h-16 items-center px-4">
-                    <BuildingSwitcher />
+                    <BuildingSwitcher onBuildingChange={handleBuildingChange} />
                     <div className="ml-auto flex items-center space-x-4">
                         <CalendarDateRangePicker />
                         <UserNav />
@@ -110,24 +170,7 @@ export default function DashboardPage() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-                                    <CardTitle className="text-sm font-medium">
-                                        {' '}
-                                        Local Time:{' '}
-                                        {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </CardTitle>
-                                    <div className="flex gap-2">
-                                        <MapPin className="h-4 w-4 text-blue-500" />
-                                        <Clock className="h-4 w-4 text-gray-500" />
-                                        <WeatherIcon condition="sunny" />
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold mt-1 pb-1">New York, US</div>
-                                    <p className="text-sm text-muted-foreground mt-1">72°F - Sunny</p>
-                                </CardContent>
-                            </Card>
+                            <WeatherCard buildingData={buildingData} />
                         </div>
 
                         {/* Graph Card */}

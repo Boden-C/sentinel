@@ -27,14 +27,15 @@ def generate_data(building_name):
         return jsonify({'message': str(e)}), 500
 
 
-@data_bp.route('/data/user/<building_name>', methods=['GET'])
+@data_bp.route('/data/building/<building_name>', methods=['GET'])
 @verify_token
 def user_data(building_name):
     """
-    Retrieve data for the authenticated user.
+    Retrieve data for the authenticated user's bulding.
     """
     try:
         data = get_building_data(user_id=g.user_id, building_name=building_name)
+        print(data)
 
         return jsonify(data), 200
     
