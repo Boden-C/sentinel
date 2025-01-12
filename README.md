@@ -12,7 +12,35 @@
    <br>
    Project for advanced monitoring multiple buildings with the use of fine-tuned AI
 </div>
-<br>
+<be>
+
+## Description
+**Sentinel** is a state-of-the-art solution revolutionizing the way multiple buildings are monitored, optimized, and controlled. Powered by cutting-edge **fine-tuned Artificial Intelligence models**, this platform seamlessly integrates **IoT sensors**, **cloud computing**, and **big data analytics** to deliver unparalleled efficiency and sustainability. It is a next-generation approach to **smart building management**, transforming real-time data into actionable intelligence.
+
+### **Key Features**
+
+1. **Multi-Building Integration**  
+   - Comprehensive monitoring across multiple facilities with **scalable AI algorithms**.  
+   - Centralized control enabled by a robust **edge-to-cloud architecture**.
+
+2. **Dynamic Energy Optimization**  
+   - Real-time energy usage tracking with advanced **predictive analytics**.  
+   - Adaptive **demand-response management** to achieve peak energy efficiency.  
+   - Integration with **renewable energy systems** like solar, wind, and grid feedback loops.
+
+3. **Environmental Intelligence**  
+   - AI-enhanced monitoring of HVAC, lighting, water usage, and occupancy patterns.  
+   - Continuous assessment of **indoor air quality (IAQ)** using **machine vision** and **smart metering**.  
+   - Automated compliance with **green building certifications** such as LEED and WELL.
+
+4. **Advanced Analytics Dashboard**  
+   - Intuitive, AI-curated visualizations accessible via **secure web and mobile interfaces**.  
+   - Proactive alert systems using **natural language processing (NLP)** for actionable insights.  
+
+5. **Self-Learning AI Systems**  
+   - **Reinforcement learning models** to autonomously adapt to building-specific patterns.  
+   - Integration with **digital twin technology** for virtual simulations and testing.  
+
 
 ## Installation
 
@@ -35,6 +63,15 @@ If you want to stay updated, you can clone the repository.
    ```bash
    git pull
    ```
+
+### Running
+
+1. Ensure it is the latest version with `git pull`
+2. Check you are on the branch you want `git checkout main`
+3. Ensure all packages are installed with `npm install` and `pip install -r requirements.txt`
+4. Run the client with `vite run dev`
+5. Run the server with `vite run server`
+6. Test with `vite test`
 
 ## Using
 
