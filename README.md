@@ -1,14 +1,9 @@
 <div align="center">
-   <h1>Sentinel</h1>
-   <a href="./LICENSE">
-      <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License">
-   </a>
-   <a href="../../releases">
-      <img src="https://img.shields.io/badge/Version-a0.1-red?style=flat-square" alt="Version">
-   </a>
-   <a href="../../wiki">
-      <img src="https://img.shields.io/badge/Wiki-WIP-red?style=flat-square" alt="Version">
-   </a>
+   <img src="https://github.com/user-attachments/assets/8a5c0b71-b367-44c1-b3ce-b74c17424d2a" alt="Sentinel">
+   <br>
+   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License"></a>
+   <a href="../../releases"><img src="https://img.shields.io/badge/Version-a0.1-red?style=flat-square" alt="Version"></a>
+   <a href="../../wiki"><img src="https://img.shields.io/badge/Wiki-WIP-red?style=flat-square" alt="Version"></a>
    <br>
    Project for advanced monitoring multiple buildings with the use of fine-tuned AI
 </div>
