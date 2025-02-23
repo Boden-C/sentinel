@@ -10,7 +10,7 @@
 <be>
 
 ## Description
-**Sentinel** is a state-of-the-art solution revolutionizing the way multiple buildings are monitored, optimized, and controlled. Powered by cutting-edge **fine-tuned Artificial Intelligence models**, this platform seamlessly integrates **IoT sensors**, **cloud computing**, and **big data analytics** to deliver unparalleled efficiency and sustainability. It is a next-generation approach to **smart building management**, transforming real-time data into actionable intelligence.
+**Sentinel** is a tool meant to simplify the way multiple buildings are monitored, optimized, and controlled. Using **fine-tuned Artificial Intelligence models**, this platform seamlessly integrates **IoT sensors**, **cloud computing**, and **big data analytics** to deliver unparalleled efficiency and sustainability. It is a simpler approach to **smart building management**, transforming real-time data into actionable intelligence.
 
 ### **Key Features**
 
