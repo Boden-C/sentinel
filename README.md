@@ -5,12 +5,12 @@
    <a href="../../releases"><img src="https://img.shields.io/badge/Version-a0.1-red?style=flat-square" alt="Version"></a>
    <a href="../../wiki"><img src="https://img.shields.io/badge/Wiki-WIP-red?style=flat-square" alt="Version"></a>
    <br>
-   Project for advanced monitoring multiple buildings with the use of fine-tuned AI
+   Project for advanced monitoring of multiple buildings with the use of fine-tuned AI
 </div>
 <be>
 
 ## Description
-**Sentinel** is a tool meant to simplify the way multiple buildings are monitored, optimized, and controlled. Using **fine-tuned Artificial Intelligence models**, this platform seamlessly integrates **IoT sensors**, **cloud computing**, and **big data analytics** to deliver unparalleled efficiency and sustainability. It is a simpler approach to **smart building management**, transforming real-time data into actionable intelligence.
+**Sentinel** is a tool meant to simplify the way multiple buildings are monitored, optimized, and controlled. Using optimized Artificial Intelligence models, this platform seamlessly integrates the current environment with IoT sensors and data analytics to deliver efficiency and sustainability. It was created as a proof-of-concept and won the AI Integration award.
 
 ### **Key Features**
 
